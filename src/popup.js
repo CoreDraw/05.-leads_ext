@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('market').textContent = info.businessMarket;
     }
 
+    document.getElementById('giveConsent').addEventListener('click', function() {
+        chrome.storage.sync.set({userConsent: true}, function() {
+            consentElement.style.display = 'none';
+            contentElement.style.display = 'block';
+            // Proceed with normal extension functionality
+        });
+    });
+
     document.getElementById('addProspect').addEventListener('click', function() {
         const name = document.getElementById('prospectName').value;
         const email = document.getElementById('prospectEmail').value;
@@ -46,11 +54,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const loadingElement = document.getElementById('loading');
         const contentElement = document.getElementById('content');
         const errorElement = document.getElementById('error');
+        const consentElement = document.getElementById('consent');
     
         loadingElement.style.display = 'block';
         contentElement.style.display = 'none';
         errorElement.style.display = 'none';
     
+        chrome.storage.sync.get(['userConsent'], function(result) {
+            if (result.userConsent) {
+                consentElement.style.display = 'none';
+                contentElement.style.display = 'block';
+                // Proceed with normal extension functionality
+            } else {
+                consentElement.style.display = 'block';
+                contentElement.style.display = 'none';
+            }
+        });
         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
             chrome.tabs.sendMessage(tabs[0].id, {type: 'GET_PAGE_INFO'}, function(response) {
                 loadingElement.style.display = 'none';
@@ -67,6 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    
 
     updateProspectList();
 });
