@@ -42,6 +42,31 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+    document.addEventListener('DOMContentLoaded', function() {
+        const loadingElement = document.getElementById('loading');
+        const contentElement = document.getElementById('content');
+        const errorElement = document.getElementById('error');
+    
+        loadingElement.style.display = 'block';
+        contentElement.style.display = 'none';
+        errorElement.style.display = 'none';
+    
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, {type: 'GET_PAGE_INFO'}, function(response) {
+                loadingElement.style.display = 'none';
+                if (response && response.data) {
+                    contentElement.style.display = 'block';
+                    displayPageInfo(response.data);
+                } else if (response && response.type === 'ERROR') {
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = 'Error: ' + response.message;
+                } else {
+                    errorElement.style.display = 'block';
+                    errorElement.textContent = 'Error: Unable to retrieve page information';
+                }
+            });
+        });
+    });
 
     updateProspectList();
 });
