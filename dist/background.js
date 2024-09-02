@@ -1,0 +1,1 @@
+chrome.runtime.onMessage.addListener((function(e,t,a){"PAGE_INFO"===e.type&&chrome.storage.local.set({lastPageInfo:e.data})})),chrome.tabs.onUpdated.addListener((function(e,t,a){"complete"===t.status&&chrome.tabs.sendMessage(e,{type:"PAGE_LOADED"})}));
